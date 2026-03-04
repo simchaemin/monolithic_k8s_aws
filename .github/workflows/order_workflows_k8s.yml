@@ -40,5 +40,6 @@ jobs:
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
       - name: kubectl apply
-        run: kubectl apply -f k8s/order_redis.yml
+        run: |
+          kubectl apply -f k8s/order_redis.yml
           kubectl apply -f k8s/order_deployment.yml
