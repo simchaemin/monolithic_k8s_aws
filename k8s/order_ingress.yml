@@ -1,0 +1,25 @@
+# aws nlb -> ingress controller(pod) -> ingress -> service -> pod
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: order-ingress
+  namespace: lgcns
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: server.chaemin.cloud
+      http:
+        paths:
+          - path: /inspire(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: order-service
+                port:
+                  number: 80

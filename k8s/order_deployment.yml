@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-deployment
+  namespace: lgcns
+
+spec:
+  revisionHistoryLimit: 2
+
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-pod
+
+  template:
+    metadata:
+      labels:
+        app: order-pod
+
+    spec:
+      # docker container
+      containers:
+        - name: order-container
+
+          # rolling update
+          image: 310095858382.dkr.ecr.us-west-2.amazonaws.com/order-simchaemin-backend:latest
+
+          ports:
+            - containerPort: 8888
+
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: lgcns-app-secrets
+                  key: DB_HOST
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lgcns-app-secrets
+                  key: DB_PASSWORD
+
+            - name: DB_ADMIN
+              valueFrom:
+                secretKeyRef:
+                  name: lgcns-app-secrets
+                  key: DB_ADMIN
+
+---
+# core service setting
+# core group : pod, service, ConfigMap, Secret, namespace
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: lgcns
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8888
+  selector:
+    app: order-pod
