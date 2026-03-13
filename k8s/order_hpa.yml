@@ -1,0 +1,24 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: orders-backend-hap
+  namespace: lgcns
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: order-deployment
+
+  minReplicas: 2
+  maxReplicas: 4
+
+  targetCPUUtilizationPercentage: 50
+
+# hpa 통해서 pod 현황 파악을 하고 싶다면?
+# kubectl get hpa orders-backend-hap -n lgcns -w
+
+# 부하 테스트를 위해서 특정 pod 접속
+# kubectl exec -it <pod-name> -n lgcns
+# apk add --no-cache curl
+# while true; do curl -s http://order-service/product/list; done
